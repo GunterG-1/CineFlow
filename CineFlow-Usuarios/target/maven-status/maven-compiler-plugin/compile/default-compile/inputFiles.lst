@@ -1,0 +1,13 @@
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\CineFlowApplication.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\configuracion\OpenApiConfig.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\controller\UsuarioController.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\dto\ActualizarUsuarioDTO.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\dto\ErrorResponse.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\dto\LoginRequest.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\dto\LoginResponse.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\dto\PromocionDTO.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\dto\RegistroDTO.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\dto\UsuarioProfileResponse.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\model\Usuario.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\repository\UsuarioRepository.java
+C:\Users\gunte\Microservicios-CineFlow\CineFlow-Usuarios\src\main\java\com\backend\CineFlow\CineFlow\service\UsuarioService.java
