@@ -8,6 +8,7 @@ import { useCarrito } from '../contexts/carritoContext';
 import { api } from '../api';
 import { promotions } from '../database/promotions';
 import { snacks } from '../database/snacks';
+import multiply from 'ui-lib';
 
 const SEAT_ROWS = ['A', 'B', 'C', 'D', 'E', 'F'];
 const SEAT_COLUMNS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -384,7 +385,7 @@ function ResumenPedido() {
                       <span>{item.cantidad} x </span>
                     </div>
                     <div className="resumen-item-precio">
-                      <span>${(item.price * item.cantidad).toFixed(3)}</span>
+                      <span>${multiply(item.price, item.cantidad).toFixed(3)}</span>
                     </div>
                   </div>
                 ))}

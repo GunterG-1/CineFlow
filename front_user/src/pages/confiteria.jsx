@@ -1,5 +1,6 @@
 import "./pages.css";
 import { useState } from "react";
+import multiply from 'ui-lib';
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 import { useCarrito } from '../contexts/carritoContext';
@@ -31,8 +32,8 @@ function Confiteria() {
               <div className="snack-card__emoji">{snack.emoji}</div>
               <h3 className="snack-card__name">{snack.title}</h3>
               <p className="snack-card__items">{snack.description}</p>
-              <div className="snack-card__footer">
-                <span className="snack-card__price">${snack.price.toFixed(3)}</span>
+                <div className="snack-card__footer">
+                <span className="snack-card__price">${multiply(snack.price, 1).toFixed(3)}</span>
                 <button className="snack-card__btn" onClick={() => handleAgregarSnack(snack)}>
                   Añadir
                 </button>

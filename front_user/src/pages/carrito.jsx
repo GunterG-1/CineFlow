@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import './pages.css';
+import multiply from 'ui-lib';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 import { useCarrito } from '../contexts/carritoContext';
@@ -79,7 +80,7 @@ function Carrito() {
                       </div>
                     </div>
                     <div className="carrito-item__total">
-                      <span>${(item.price * item.cantidad).toFixed(3)}</span>
+                      <span>${multiply(item.price, item.cantidad).toFixed(3)}</span>
                     </div>
                     <button
                       type="button"
