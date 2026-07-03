@@ -1,174 +1,49 @@
-# CineFlow BFF - Backend for Frontend
+# 🔗 CineFlow-BFF
 
-Servidor BFF (Backend for Frontend) construido con Node.js y Express para la aplicación CineFlow.
+Backend For Frontend (BFF) construido en NestJS. Actúa como capa intermedia entre los frontends (`front_user`, `Front-Admin`) y el Gateway de microservicios, adaptando y reenviando las peticiones necesarias.
 
-## 📋 Características
+## Responsabilidades
 
-- ✅ Express.js para gestión de rutas
-- ✅ CORS habilitado para comunicación frontend
-- ✅ Validación de datos con Joi
-- ✅ Manejo centralizado de errores
-- ✅ Logger personalizado
-- ✅ Middleware de validación
-- ✅ Cliente HTTP con Axios
-- ✅ JWT para autenticación (listo para implementar)
-- ✅ Estructura modular y escalable
+- Exponer una API unificada y adaptada a las necesidades de los frontends
+- Reenviar peticiones hacia `CineFlow-Gateway`, que a su vez enruta a los microservicios correspondientes
+- Manejar autenticación de las rutas protegidas (`JwtAuthGuard`)
+- Adaptar/enriquecer payloads antes de reenviarlos (ej. obtener precio real de una función desde Cartelera antes de crear una reserva)
 
-## 🚀 Inicio Rápido
+## Módulo de reservas (`entradas`)
 
-### Requisitos
-- Node.js 18+ 
-- npm 
+| Método | Ruta | Autenticación | Descripción |
+|---|---|---|---|
+| `PATCH` | `/entradas/reservar` | JWT | Crea una reserva de asientos |
+| `POST` | `/entradas/pagar` | JWT | Procesa el pago de una reserva |
+| `GET` | `/entradas/disponibilidad` | — | Consulta asientos no disponibles para una función |
+| `GET` | `/entradas/usuario` | JWT | Reservas del usuario autenticado |
+| `GET` | `/entradas/:reservationId` | — | Detalle de una reserva |
+| `GET` | `/entradas/:reservationId/codigoqr` | — | Código QR de una reserva |
+| `DELETE` | `/entradas/:reservationId` | — | Cancela una reserva |
+| `POST` | `/entradas/verificar-ticket` | — | Valida un ticket (ej. en boletería) |
 
-### Instalación
+> El BFF actúa como *pass-through* hacia el Gateway: no aplica lógica de negocio propia sobre disponibilidad o precios, solo reenvía la petición y devuelve la respuesta del microservicio correspondiente. La excepción es `createReservation`, que primero consulta el detalle de la función en Cartelera (para obtener el precio real) antes de armar el payload hacia Entradas.
 
-1. **Instalar dependencias:**
+## Tecnologías
+
+- NestJS
+- TypeScript
+- HTTP Service interno para comunicación con el Gateway (`GATEWAY_URL`)
+
+## Ejecución
+
 ```bash
 npm install
+npm run start:dev
 ```
 
-2. **Configurar variables de entorno:**
-```bash
-cp .env.example .env
-# Edita .env con tus valores
-```
+## Variables de entorno relevantes
 
-3. **Ejecutar en desarrollo:**
-```bash
-npm run dev
-```
-
-El servidor estará disponible en `http://localhost:3000`
-
-### Verificar que está funcionando
-```bash
-curl http://localhost:3000/api/health
-```
-
-Respuesta esperada:
-```json
-{
-  "success": true,
-  "status": "healthy",
-  "timestamp": "2026-06-02T10:00:00.000Z",
-  "uptime": 1.234
-}
-```
-
-## 📁 Estructura del Proyecto
+Copia `.env.example` a `.env`:
 
 ```
-CineFlow-BFF/
-├── config/              # Configuraciones (DB, logger, etc)
-│   ├── database.js      # Configuración de base de datos
-│   └── logger.js        # Sistema de logging
-├── src/
-│   ├── controllers/     # Lógica de controladores
-│   ├── middleware/      # Middlewares personalizados
-│   │   ├── errorHandler.js
-│   │   └── validation.js
-│   ├── routes/          # Definición de rutas
-│   │   ├── index.js
-│   │   └── health.js
-│   ├── services/        # Lógica de negocio
-│   ├── utils/           # Utilidades
-│   │   └── http.js      # Cliente HTTP
-│   └── server.js        # Punto de entrada
-├── .env                 # Variables de entorno (gitignored)
-├── .env.example         # Plantilla de variables
-├── .gitignore           # Archivos ignorados por git
-├── package.json         # Dependencias del proyecto
-└── README.md            # Este archivo
+GATEWAY_URL=http://localhost:8080
+JWT_SECRET=
 ```
 
-## 🔧 Scripts Disponibles
-
-```bash
-# Desarrollo con recarga automática
-npm run dev
-
-# Producción
-npm start
-
-# Pruebas
-npm test
-
-# Linting
-npm run lint
-```
-
-## 📦 Dependencias Principales
-
-- **Express**: Framework web
-- **CORS**: Manejo de CORS
-- **Dotenv**: Variables de entorno
-- **Axios**: Cliente HTTP
-- **Joi**: Validación de datos
-- **JSONWebToken**: Autenticación JWT
-- **bcryptjs**: Hash de contraseñas
-
-## 🛠️ Próximos Pasos
-
-### 1. Conectar Base de Datos
-Edita `config/database.js` con tu librería preferida:
-- PostgreSQL (con `pg` o `prisma`)
-- MongoDB (con `mongoose`)
-- MySQL (con `mysql2`)
-
-### 2. Agregar Rutas
-Crea nuevas rutas en `src/routes/`:
-
-```javascript
-// src/routes/movies.js
-import express from 'express';
-import { getMovies, createMovie } from '../controllers/moviesController.js';
-import { validateRequest } from '../middleware/validation.js';
-
-const router = express.Router();
-const schema = Joi.object({ /* ... */ });
-
-router.get('/', getMovies);
-router.post('/', validateRequest(schema), createMovie);
-
-export default router;
-```
-
-### 3. Agregar Controladores
-Crea controladores en `src/controllers/`:
-
-```javascript
-export const getMovies = async (req, res, next) => {
-  try {
-    // Lógica aquí
-    res.json({ success: true, data: [] });
-  } catch (error) {
-    next(error);
-  }
-};
-```
-
-### 4. Agregar Servicios
-Crea servicios en `src/services/` para lógica de negocio.
-
-## 🔐 Seguridad
-
-- CORS configurado
-- Validación de entrada con Joi
-- Manejo de errores centralizado
-- Variables sensibles en `.env`
-- JWT ready (requiere implementación)
-
-## 📝 Notas
-
-- Reemplaza los valores en `.env` antes de desplegar
-- Implementa la conexión real a base de datos
-- Agrega autenticación JWT donde sea necesario
-- Configura CORS_ORIGIN con tu frontend
-
-## 📄 Licencia
-
-ISC
-
-## 🤝 Contribución
-
-Para agregar features, sigue la estructura establecida y mantén la consistencia con el patrón MVC.
+⚠️ No subir el `.env` real con secretos al repositorio.

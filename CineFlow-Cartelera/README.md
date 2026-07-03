@@ -1,144 +1,64 @@
-# CineFlow - Cartelera (Microservicio)
+# 🎥 CineFlow-Cartelera
 
-Descripción
------------
-Gestiona películas, funciones y butacas. Provee endpoints para consultar cartelera y disponibilidad.
+Microservicio responsable del catálogo de películas, funciones, salas y butacas.
 
-Ejecutar localmente
--------------------
-Requisitos: Java 17, Maven y MySQL.
+## Responsabilidades
 
-```bash
-cd CineFlow-Cartelera
-./mvnw spring-boot:run
-```
+- CRUD de películas (crear, listar, actualizar, ocultar/mostrar, eliminar)
+- Gestión de funciones (horarios de proyección) por película
+- Gestión de salas (tipo, capacidad, precio base)
+- Gestión de butacas por función (reservar / liberar / sembrar butacas)
+- Carga de archivos multimedia (imágenes, banners) asociados a películas
 
-Propiedades
-- Puerto: `8082`.
-- Swagger UI: `http://localhost:8082/swagger-ui.html`
+## Modelo de datos
 
-Tests
------
-```bash
-./mvnw test
-```
-# CineFlow-Cartelera
+Tablas principales:
 
-Microservicio de cartelera: contiene entidades, repositorios y endpoints para películas, salas y funciones.
+- **`peliculas`** — catálogo de películas
+- **`funciones`** — funciones (horario, sala, película asociada)
+- **`salas`** — salas del cine (tipo, precio base)
+- **`asientos`** — butacas por función, con columnas `estado` (`AVAILABLE`, `RESERVED`, `SOLD`), `fila`, `numero`, `function_id`
 
-Ejecutar:
+> ⚠️ **Nota de arquitectura**: este microservicio mantiene su propio modelo de butacas (`asientos`, por `fila`/`numero`/`function_id`), independiente del modelo de tickets del microservicio **CineFlow-Entradas** (que usa `clave_funcion`/`numero_asiento`). Actualmente **no están sincronizados automáticamente** — evaluar si conviene unificar ambos modelos o mantener un mecanismo de sincronización entre ellos.
 
-```
-cd CineFlow-Cartelera
-./mvnw spring-boot:run
-```
+## Endpoints principales
 
-Construir:
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/api/cartelera/peliculas/cartelera` | Películas visibles en cartelera |
+| `GET` | `/api/cartelera/peliculas` | Todas las películas (visibles y ocultas) |
+| `GET` | `/api/cartelera/peliculas/{id}` | Detalle de una película |
+| `POST` | `/api/cartelera/peliculas` | Crear película |
+| `PUT` | `/api/cartelera/peliculas/{id}` | Actualizar película |
+| `DELETE` | `/api/cartelera/peliculas/{id}` | Eliminar película |
+| `PATCH` | `/api/cartelera/peliculas/{id}/visibility` | Alternar visibilidad |
+| `POST` | `/api/cartelera/media` | Subir imagen/banner |
+| `GET` | `/api/cartelera/funciones` | Listar todas las funciones |
+| `GET` | `/api/cartelera/funciones/{id}` | Detalle de una función (incluye precio y sala) |
+| `POST` | `/api/cartelera/funciones` | Crear función |
+| `GET` | `/api/cartelera/peliculas/{movieId}/funciones` | Funciones de una película |
+| `GET` | `/api/cartelera/funciones/{id}/butacas` | Disponibilidad de butacas de una función |
+| `POST` | `/api/cartelera/funciones/{id}/butacas/reserve` | Reservar una butaca |
+| `POST` | `/api/cartelera/funciones/{id}/butacas/release` | Liberar una butaca |
+| `POST` | `/api/cartelera/funciones/{id}/butacas/seed` | Generar butacas para funciones creadas antes del fix (idempotente) |
+| `GET` | `/api/cartelera/salas` | Listar salas |
 
-```
-./mvnw clean package
-```
+## Tecnologías
 
-Notas:
+- Java / Spring Boot
+- Spring Data JPA
+- MySQL (`cartelera`)
 
-- Configuración en `src/main/resources/application.properties`.
-- Contiene inicializador de datos: `DataInitializer`.
-# MS-Cartelera (CineFlow)
-
-> Microservicio `MS-Cartelera` para gestionar catálogo de películas, salas, funciones y butacas.
-
-## Resumen
-- Lenguaje: Java 17
-- Framework: Spring Boot 3.5.x
-- Persistencia: JPA (configurado para MySQL por defecto)
-- Lombok: usado en modelos
-
-## Requisitos
-- Java 17
-- Maven
-- MySQL en `localhost:3306` (o actualizar en configuración)
-
-## Archivos relevantes
-- Configuración de aplicación: [src/main/resources/application.properties](src/main/resources/application.properties)
-- Controlador REST principal: [src/main/java/com/backend/CineFlow/CineFlow/cartelera/controller/CatalogController.java](src/main/java/com/backend/CineFlow/CineFlow/cartelera/controller/CatalogController.java)
-- DTOs: [src/main/java/com/backend/CineFlow/CineFlow/cartelera/dto](src/main/java/com/backend/CineFlow/CineFlow/cartelera/dto)
-- Modelos JPA: [src/main/java/com/backend/CineFlow/CineFlow/cartelera/model](src/main/java/com/backend/CineFlow/CineFlow/cartelera/model)
-
-## Configurar base de datos (MySQL)
-1. Iniciar MySQL y crear la BD **`cartelera`**:
-
-```sql
-CREATE DATABASE IF NOT EXISTS cartelera CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-2. La aplicación usa las siguientes credenciales por defecto (actualizar en `application.properties` si es necesario):
-   - **Usuario:** `root`
-   - **Contraseña:** (vacía)
-   - **Host:** `localhost`
-   - **Puerto:** `3306`
-   - **BD:** `cartelera`
-
-> Nota: la propiedad `spring.jpa.hibernate.ddl-auto=create-drop` crea las tablas automáticamente (ideal para desarrollo).
-
-## Ejecutar
+## Ejecución
 
 ```bash
 mvn spring-boot:run
 ```
 
-o compilar sin tests:
+## Variables de entorno relevantes
 
-```bash
-mvn -DskipTests compile
 ```
-
-## Endpoints (paths en español)
-
-- `GET /peliculas/cartelera` — Obtener cartelera de películas
-- `GET /funciones/{id}/butacas` — Obtener butacas y estado de una función
-- `POST /funciones` — Crear una nueva función
-
-### Ejemplos POST /funciones (JSON)
-
-2D:
-
-```json
-{
-  "idPelicula": 1,
-  "idSala": 1,
-  "formato": "TWO_D",
-  "fechaInicio": "2026-05-01T19:30:00",
-  "precio": 9.50
-}
+DB_URL=
+DB_USER=
+DB_PASSWORD=
 ```
-
-3D:
-
-```json
-{
-  "idPelicula": 2,
-  "idSala": 2,
-  "formato": "THREE_D",
-  "fechaInicio": "2026-05-02T21:00:00",
-  "precio": 14.00
-}
-```
-
-### Curl de ejemplo
-
-```bash
-curl -X POST http://localhost:8080/funciones \
-  -H "Content-Type: application/json" \
-  -d '{"idPelicula":1,"idSala":1,"formato":"TWO_D","fechaInicio":"2026-05-01T19:30:00","precio":9.50}'
-```
-
-## Formatos y localización
-- Los campos de las respuestas y peticiones están en español (`titulo`, `descripcion`, `genero`, `duracionMinutos`, `calificacion`, `idPelicula`, `idSala`, `fechaInicio`, `precio`, `butacas`, etc.).
-- Los `precio` en respuestas se serializan en formato chileno (puntos como separador de miles y coma para decimales), p.ej. `"9,50"`.
-- Las fechas (`fechaInicio`) se serializan en zona horaria de Chile (`America/Santiago`, UTC-4) usando el formato `yyyy-MM-dd'T'HH:mm:ss`.
-
-## Notas adicionales
-- Seeder de datos: [src/main/java/com/backend/CineFlow/CineFlow/cartelera/service/CatalogDataSeeder.java](src/main/java/com/backend/CineFlow/CineFlow/cartelera/service/CatalogDataSeeder.java) crea datos de ejemplo al iniciar si la base está vacía.
-- Si quieres cambiar a H2 para pruebas rápidas, restaura la dependencia H2 en `pom.xml` y actualiza `application.properties` (originalmente venía con H2 en memoria).
-
-Si quieres que añada instrucciones para Docker, Postman collection o tests automáticos, dímelo y lo preparo.
