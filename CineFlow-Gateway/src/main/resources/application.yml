@@ -1,0 +1,96 @@
+spring:
+  application:
+    name: CineFlow-Gateway
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      server:
+        webflux:
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+          routes:
+            # Subida de imagen/banner: el endpoint vive en /api/cartelera/media
+            - id: cartelera-media-service
+              order: -10
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/cartelera/media
+              filters:
+                - StripPrefix=0
+
+            # Microservicio Cartelera (Películas)
+            - id: cartelera-service
+              order: -1
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/cartelera/**
+              filters:
+                - StripPrefix=0
+
+            # Microservicio Usuarios (Autenticación y Usuarios)
+            - id: usuarios-service
+              uri: http://localhost:8081
+              predicates:
+                - Path=/api/usuarios/**
+              filters:
+                - StripPrefix=1
+
+            # Microservicio Confitería
+            - id: confiteria-service
+              uri: http://localhost:8083
+              predicates:
+                - Path=/api/confiteria/**
+              filters:
+                - StripPrefix=0
+
+            # Microservicio Entradas
+            - id: entradas-service
+              uri: http://localhost:8084
+              predicates:
+                - Path=/api/entradas/**
+              filters:
+                - StripPrefix=0
+
+            # BFF (para otros endpoints como /api/auth, /api/movies, /api/profile)
+            - id: bff-service
+              order: 10
+              uri: http://localhost:4000
+              predicates:
+                - Path=/api/**
+              filters:
+                - StripPrefix=0
+
+          # Configuración global de CORS
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - http://localhost:3000
+                  - http://localhost:3001
+                  - http://localhost:3002
+                  - http://localhost:3003
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - PATCH
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
+                maxAge: 3600
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web: INFO

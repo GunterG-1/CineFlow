@@ -1,0 +1,21 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: clip;
+  background:
+    radial-gradient(circle at top, rgba(20, 72, 206, 0.12), transparent 35%),
+    linear-gradient(180deg, #f6f8fd 0%, #eef3fb 100%);
+}
+
+.app-shell > main {
+  width: min(100%, 1200px);
+  margin-inline: auto;
+}
+
+@media (max-width: 640px) {
+  .app-shell > main {
+    width: 100%;
+  }
+}
